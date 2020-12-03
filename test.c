@@ -27,11 +27,11 @@ int main(int argc, char **argv)
                         break;
 
                 if (buf[buf_temp_len - 1] == '\n') {
-                        lines_to_start++;
                         if (!strncmp(buf, START_LINE, START_LINE_LEN - 3)) {
                                 printf("FOUND IT <<start>>! $%s$\n", buf);
                                 break;
                         }
+                        lines_to_start++;
                         printf("Buffer: $%s$\n", buf);
                         continue;
                 }
@@ -55,11 +55,11 @@ int main(int argc, char **argv)
                         break;
 
                 if (buf[buf_temp_len - 1] == '\n') {
-                        lines_to_start++;
                         if (!strncmp(buf, END_LINE, END_LINE_LEN - 3)) {
                                 printf("FOUND IT <<end>>! $%s$\n", buf);
                                 break;
                         }
+                        lines_to_end++;
                         printf("Buffer: $%s$\n", buf);
                         continue;
                 }
@@ -70,8 +70,11 @@ int main(int argc, char **argv)
                         getchar();
                 }
                 puts("END OF LINE");
-                lines_to_start++; 
+                lines_to_end++; 
         }
+
+        printf("Lines to the 'start line': %d\n", lines_to_start);
+        printf("Lines from the 'start line' to the 'end line': %d\n", lines_to_end);
 
         return 0;
 }
