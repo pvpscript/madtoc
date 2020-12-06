@@ -26,7 +26,7 @@ static void advance_file_chunk(FILE *f, long backstep, long bytes_add,
         }
 }
 
-static void goback_file_chunk(FILE *f, off_t file_size, long forwardstep,
+static void shrink_file_chunk(FILE *f, off_t file_size, long forwardstep,
                 long bytes_remove, long offset)
 {
         char buf[BUF_SIZE];
@@ -59,11 +59,11 @@ static void advance_file(FILE *f, off_t file_size, long bytes_add, long offset)
         advance_file_chunk(f, backstep, bytes_add, offset);
 }
 
-static void goback_file(FILE *f, off_t file_size, long bytes_remove, long offset)
+static void shrink_file(FILE *f, off_t file_size, long bytes_remove, long offset)
 {
         long forwardstep = MIN(file_size, BUF_SIZE);
 
-        goback_file_chunk(f, file_size, forwardstep, bytes_remove, offset);
+        shrink_file_chunk(f, file_size, forwardstep, bytes_remove, offset);
         ftruncate(fileno(f), file_size - bytes_remove);
 }
 
@@ -77,7 +77,7 @@ int main(void)
 //        advance_file(f, get_file_size("./test.md"), strlen(fonky_chonky), 37);
 //        fseek(f, 37, SEEK_SET);
 //        fwrite(fonky_chonky, sizeof (char), strlen(fonky_chonky), f);
-        goback_file(f, get_file_size("./test.md"), strlen(message), 37);
+        shrink_file(f, get_file_size("./test.md"), strlen(message), 37);
 
         fclose(f);
 }
