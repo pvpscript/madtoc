@@ -34,7 +34,7 @@ char *get_file_path(struct file *f)
         return f->path;
 }
 
-static off_t get_file_size(const char *path)
+static off_t get_file_size_helper(const char *path)
 {
         struct stat buf;
 
@@ -46,5 +46,5 @@ static off_t get_file_size(const char *path)
 
 off_t get_file_size(struct file *f)
 {
-        return get_file_size(f->path);
+        return get_file_size_helper(f->path);
 }
