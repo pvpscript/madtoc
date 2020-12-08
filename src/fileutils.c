@@ -44,12 +44,16 @@ static void shrink_file_chunk(FILE *f, off_t file_size, long forwardstep,
         }
 }
 
-void advance_file(struct file *f, long bytes_add, long offset)
+void advance_file(struct file *f, char *str_add, long offset)
 {
         off_t file_size = get_file_size(f);
         long backstep = MIN(file_size - offset, BUF_SIZE);
+        long bytes_add = strlen(str_add);
+        FILE *fp = get_file_pointer(f);
 
-        advance_file_chunk(get_file_pointer(f), backstep, bytes_add, offset);
+        advance_file_chunk(fp, backstep, bytes_add, offset);
+        fseek(fp, offset, SEEK_SET);
+        fwrite(str_add, sizeof (char), bytes_add, fp);
 }
 
 void shrink_file(struct file *f, long bytes_remove, long offset)
@@ -61,20 +65,3 @@ void shrink_file(struct file *f, long bytes_remove, long offset)
         shrink_file_chunk(fp, file_size, forwardstep, bytes_remove, offset);
         ftruncate(fileno(fp), file_size - bytes_remove);
 }
-
-/*
-int main(void)
-{
-        struct file *f = open_file("./test.md");
-        char *message = "This is a very cool message!\n";
-        char *loren = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ullamcorper quam mauris, at posuere augue posuere non. Sed iaculis elit et placerat dictum. Nam faucibus venenatis ex. Nullam tempor eros vel lectus gravida tincidunt. Phasellus tincidunt, nisl eget porttitor rhoncus, neque tellus aliquam massa, in ultrices est metus ac sapien. Nam dignissim ipsum diam, vel efficitur nisi placerat vitae. Morbi auctor tellus non ipsum efficitur fringilla id nec ex. Ut lectus magna, laoreet cursus erat at, iaculis egestas nisi. In euismod nisl eu tortor porttitor, vel euismod eros faucibus. Nullam enim quam, iaculis sed nunc euismod, euismod interdum metus. Mauris tristique odio dui, sit amet aliquam mauris ultricies vel. Aliquam condimentum ornare metus, ac blandit nibh elementum at. Curabitur maximus velit rutrum, vestibulum felis sed, dignissim enim. Nam laoreet, nunc eget condimentum viverra, ipsum tortor ullamcorper lorem, a iaculis metus sapien congue risus. Suspendisse sapien diam, rutrum a nulla convallis, sagittis porta justo. Quisque id viverra dolor. Aenean eu convallis mauris, quis rhoncus leo. Nunc tincidunt nibh sed faucibus tempor. Nulla vitae dictum augue, vel ultrices purus. Aliquam efficitur magna nec metus rhoncus molestie. Fusce eget dolor est. Aenean accumsan condimentum ipsum, ac molestie nibh euismod ac. Proin iaculis volutpat diam, at varius libero pretium duis.\n";
-        char *fonky_chonky = "Do you want the fonky chonky?\n";
-
-//        advance_file(f, get_file_size("./test.md"), strlen(fonky_chonky), 37);
-//        fseek(f, 37, SEEK_SET);
-//        fwrite(fonky_chonky, sizeof (char), strlen(fonky_chonky), f);
-        shrink_file(f, strlen(message), 37);
-
-        fclose(f);
-}
-*/
