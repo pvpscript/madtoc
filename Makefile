@@ -7,7 +7,7 @@ MAN_DIR = doc
 CC = cc
 DEBUG = -g
 CMPTIME = -DVERSION=\"${VERSION}\" -D_XOPEN_SOURCE=500
-CFLAGS = ${CMPTIME} ${DEBUG} -ansi -pedantic -Wall
+CFLAGS = ${CMPTIME} ${DEBUG} -std=c99 -pedantic -Wall
 
 BIN = mdtoc
 
