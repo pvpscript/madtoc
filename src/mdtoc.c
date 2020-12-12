@@ -4,8 +4,8 @@
 #include "file.h"
 #include "fileutils.h"
 
-#define START_LINE      "[//]: #mdtoc_start"
-#define END_LINE        "[//]: #mdtoc_end" 
+#define START_LINE      "<!-- mdtoc-start -->"
+#define END_LINE        "<!-- mdtoc-end -->" 
 
 #define MAX(x, y) ((x) > (y)) ? (x) : (y)
 
@@ -14,30 +14,27 @@ struct file_info {
         long offset_end;
 };
 
+
 static long parse_section(FILE *fp, char *section)
 {
-        size_t section_len = strlen(section);
-        char buf[section_len + 1 /* \n */ + 1 /* \0 */];
-        long curr_offset;
-        size_t buf_temp_len;
-        char w;
 
-        for (;;) {
-                curr_offset = ftell(fp);
-                if (fgets(buf, sizeof buf, fp))
-                        buf_temp_len = ftell(fp) - curr_offset;
-                else
-                        break;
+        size_t section_size = strlen(section);
+        char c;
+        int i;
 
-                if (buf[buf_temp_len - 1] == '\n') {
-                        if (section_len == buf_temp_len - 1 &&
-                                        !strncmp(buf, section, section_len - 1))
-                                return ftell(fp); /* offset position */
+        for (i = 0; (c = fgetc(fp)) != EOF; ) {
+                if (c == section[i]) {
+                        i++;
+                } else if (c == ' ') {
+                        continue;
+                } else if (c == '\n' && i == section_size) {
+                        return ftell(fp);
+                } else {
+                        while (c = fgetc(fp), c != '\n' && c != EOF)
+                                ;
+                        i = 0;
                         continue;
                 }
-
-                while((w = fgetc(fp)) != '\n')
-                        ;
         }
 
         return -1;
