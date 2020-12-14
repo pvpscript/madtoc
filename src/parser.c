@@ -42,14 +42,32 @@ static void show_section_and_subsections(struct section *s)
                 printf("Subsection %d: %s\n", i, s->subsections[i]->name);
 }
 
+void destroy_section(struct section *s)
+{
+        int i;
+
+        if (s->total_subsections == 0) {
+                free(s);
+        } else {
+                for (i = 0; i < s->total_subsections; i++)
+                        destroy_section(s->subsections[i]);
+
+                free(s->subsections);
+                free(s);
+        }
+}
+
 int main(void)
 {
         struct section *s = new_section("Some pretty cool title, innit", 1);
         struct section *ss = add_subsection(s, new_section("Fancy a cuppa?", 2));
+        struct section *ss2 = add_subsection(s, new_section("Hello, World", 2));
+        struct section *ss3 = add_subsection(s, new_section("Hi there", 2));
 
         show_section_and_subsections(s);
         show_section_and_subsections(ss);
 
+        destroy_section(s);
 
         return 0;
 }
