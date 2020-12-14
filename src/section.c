@@ -20,6 +20,21 @@ struct section *new_section(char *name, int level)
         return s;
 }
 
+char *get_section_name(struct section *s)
+{
+        return s->name;
+}
+
+struct section **get_section_subsections(struct section *s)
+{
+        return s->subsections;
+}
+
+size_t get_section_total_subsections(struct section *s)
+{
+        return s->total_subsections;
+}
+
 struct section *add_subsection(struct section *s, struct section *subs)
 {
         s->subsections = realloc(s->subsections,
