@@ -39,7 +39,7 @@ static void show_section_and_subsections(struct section *s)
 
         printf("\nThis section: %s\n", s->name);
         for (i = 0; i < s->total_subsections; i++)
-                printf("Subsection %d: %s\n", s->subsections[i]->name);
+                printf("Subsection %d: %s\n", i, s->subsections[i]->name);
 }
 
 int main(void)
