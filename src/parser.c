@@ -24,16 +24,17 @@ void parse_section(FILE *fp)
 {
         int level = 0;
         char c;
+        char prev;
         struct section *sections[20] = { 0 };
         struct section *s;
         int sections_index = 0;
         char buf[500];
         int buf_index = 0;
 
-        while ((c = fgetc(fp)) != EOF) {
+        for (prev = 0; (c = fgetc(fp)) != EOF; prev = c) {
                 if (c == '#') {
                         level++;
-                } else if (c != '#' && c != ' ') {
+                } else if (c != '#' && c != ' ' || c == ' ' && prev != '#') {
                         while (c = fgetc(fp), c != '\n' && c != EOF)
                                 ;
                         level = 0;
