@@ -25,6 +25,11 @@ char *get_section_name(struct section *s)
         return s->name;
 }
 
+int get_section_level(struct section *s)
+{
+        return s->level;
+}
+
 struct section **get_section_subsections(struct section *s)
 {
         return s->subsections;
