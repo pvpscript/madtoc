@@ -49,16 +49,20 @@ struct section *add_subsection(struct section *s, struct section *subs)
         return subs;
 }
 
-void destroy_section(struct section *s)
+void destroy_section(struct section *s, void (free_inner(void *)))
 {
         int i;
 
         if (s->total_subsections == 0) {
+                if (free_inner)
+                        free_inner(s->name);
                 free(s);
         } else {
                 for (i = 0; i < s->total_subsections; i++)
-                        destroy_section(s->subsections[i]);
+                        destroy_section(s->subsections[i], free_inner);
 
+                if (free_inner)
+                        free_inner(s->name);
                 free(s->subsections);
                 free(s);
         }

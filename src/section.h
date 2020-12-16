@@ -11,6 +11,6 @@ int get_section_level(struct section *s);
 struct section **get_section_subsections(struct section *s);
 size_t get_section_total_subsections(struct section *s);
 struct section *add_subsection(struct section *s, struct section *subs);
-void destroy_section(struct section *s);
+void destroy_section(struct section *s, void (free_inner(void *)));
 
 #endif /* SECTION_H */
