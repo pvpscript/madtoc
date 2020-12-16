@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "section.h"
+#include "buffer.h"
+#include "list.h"
 
 void show_section_and_subsections(struct section *s)
 {
@@ -20,18 +22,16 @@ void show_section_and_subsections(struct section *s)
         puts("");
 }
 
-void parse_section(FILE *fp)
+struct list *parse_section(FILE *fp)
 {
-        int level = 0;
+        struct list *sections = init_list();
+        struct buffer *buf = new_buffer(500);
+        struct node *n;
         char c;
         char prev;
-        struct section *sections[20] = { 0 };
-        struct section *s;
-        int sections_index = 0;
-        char buf[500];
-        int buf_index = 0;
+        int level;
 
-        for (prev = 0; (c = fgetc(fp)) != EOF; prev = c) {
+        for (level = 0, prev = 0; (c = fgetc(fp)) != EOF; prev = c) {
                 if (c == '#') {
                         level++;
                 } else if (c != '#' && c != ' ' || c == ' ' && prev != '#') {
@@ -40,25 +40,23 @@ void parse_section(FILE *fp)
                         level = 0;
                 } else if (c == ' ' && level > 0 && level <= MAX_SECTION_LEN) {
                         while ((c = fgetc(fp)) != '\n')
-                                buf[buf_index++] = c;
-                        buf[buf_index] = 0;
+                                add_buffer_char(buf, c);
 
-                        s = sections[sections_index - 1];
-                        if (sections_index > 0 && level > get_section_level(s)) {
-                                add_subsection(s, new_section(strdup(buf), level));
-                                printf("Added subsection: %s\n", buf);
-                        } else {
-                                sections[sections_index++] = new_section(
-                                                strdup(buf), level);
-                                printf("Added section: %s\n", buf);
-                        }
+                        n = list_get_tail(sections);
+                        if (n && level > get_section_level(node_get_data(n)))
+                                add_subsection(node_get_data(n),
+                                        new_section(strdup(buf->str), level));
+                        else
+                                list_add(sections, 
+                                        new_section(strdup(buf->str), level));
                         level = 0;
-                        buf_index = 0;
+                        reset_buffer(buf);
                 }
         }
 
-        for(int i = 0; i < sections_index; i++)
-                show_section_and_subsections(sections[i]);
+        destroy_buffer(buf);
+
+        return sections;
 }
 
 int main(void)
@@ -77,11 +75,19 @@ int main(void)
         show_section_and_subsections(s);
         show_section_and_subsections(ss);
 
-        destroy_section(s);
+        destroy_section(s, NULL);
 
         FILE *f = fopen("../test.md", "r");
-        parse_section(f);
+        struct list *sections = parse_section(f);
+        struct node *n;
+        for (n = list_get_head(sections); n; n = node_get_next(n)) {
+                show_section_and_subsections(node_get_data(n));
+                destroy_section(node_get_data(n), free);
+        }
 
+        destroy_list(sections, NULL);
+
+        fclose(f);
 
         return 0;
 }
