@@ -6,22 +6,6 @@
 #include "buffer.h"
 #include "list.h"
 
-void show_section_and_subsections(struct section *s)
-{
-        int i;
-        struct section **sub;
-
-        printf("%*sThis section: %s\n", get_section_level(s)-1, "", get_section_name(s));
-        sub = get_section_subsections(s);
-        for (i = 0; i < get_section_total_subsections(s); i++) {
-                if (get_section_total_subsections(sub[i]) > 0)
-                        show_section_and_subsections(sub[i]);
-
-                printf("%*sSubsection %d: %s\n", get_section_level(sub[i])-1, "", i, get_section_name(sub[i]));
-        }
-        puts("");
-}
-
 long parse_toc(FILE *fp, char *section)
 {
 
