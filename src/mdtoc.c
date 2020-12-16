@@ -3,6 +3,8 @@
 
 #include "file.h"
 #include "fileutils.h"
+#include "parser.h"
+#include "list.h"
 
 #define START_LINE      "<!-- mdtoc-start -->"
 #define END_LINE        "<!-- mdtoc-end -->" 
@@ -14,39 +16,13 @@ struct file_info {
         long offset_end;
 };
 
-
-static long parse_section(FILE *fp, char *section)
-{
-
-        size_t section_size = strlen(section);
-        char c;
-        int i;
-
-        for (i = 0; (c = fgetc(fp)) != EOF; ) {
-                if (c == section[i]) {
-                        i++;
-                } else if (c == ' ') {
-                        continue;
-                } else if (c == '\n' && i == section_size) {
-                        return ftell(fp);
-                } else {
-                        while (c = fgetc(fp), c != '\n' && c != EOF)
-                                ;
-                        i = 0;
-                        continue;
-                }
-        }
-
-        return -1;
-}
-
 void parse_file(struct file *f)
 {
         FILE *fp = get_file_pointer(f);
         struct file_info info;
         
-        info.offset_start = parse_section(fp, START_LINE);
-        info.offset_end = parse_section(fp, END_LINE);
+        info.offset_start = parse_toc(fp, START_LINE);
+        info.offset_end = parse_toc(fp, END_LINE);
 
         printf("Bytes offset for the beginning: %ld\n", info.offset_start);
         printf("Bytes offset for the end: %ld\n", info.offset_end);
