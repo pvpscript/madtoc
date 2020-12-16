@@ -59,7 +59,8 @@ struct list *parse_section(FILE *fp)
         for (level = 0, prev = 0; (c = fgetc(fp)) != EOF; prev = c) {
                 if (c == '#') {
                         level++;
-                } else if (c != '#' && c != ' ' || c == ' ' && prev != '#') {
+                } else if ((c != '#' && c != ' ') ||
+                                (c == ' ' && prev != '#')) {
                         while (c = fgetc(fp), c != '\n' && c != EOF)
                                 ;
                         level = 0;
