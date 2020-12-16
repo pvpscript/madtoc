@@ -68,38 +68,3 @@ struct list *parse_section(FILE *fp)
 
         return sections;
 }
-
-/*
-int main(void)
-{
-        struct section *s = new_section("Some pretty cool title, innit", 1);
-        struct section *ss = add_subsection(s, new_section("Fancy a cuppa?", 2));
-        struct section *kk = add_subsection(ss, new_section("So english m8", 3));
-        add_subsection(kk, new_section("Du", 4));
-        add_subsection(kk, new_section("Du Hast", 4));
-        add_subsection(kk, new_section("Du Hast Mich", 4));
-        add_subsection(kk, new_section("Du Hast Mich Gefragt", 4));
-        add_subsection(ss, new_section("Bri'ish", 3));
-        struct section *ss2 = add_subsection(s, new_section("Hello, World", 2));
-        struct section *ss3 = add_subsection(s, new_section("Hi there", 2));
-
-        show_section_and_subsections(s);
-        show_section_and_subsections(ss);
-
-        destroy_section(s, NULL);
-
-        FILE *f = fopen("../test.md", "r");
-        struct list *sections = parse_section(f);
-        struct node *n;
-        for (n = list_get_head(sections); n; n = node_get_next(n)) {
-                show_section_and_subsections(node_get_data(n));
-                destroy_section(node_get_data(n), free);
-        }
-
-        destroy_list(sections, NULL);
-
-        fclose(f);
-
-        return 0;
-}
-*/
