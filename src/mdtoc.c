@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "file.h"
 #include "fileutils.h"
+#include "section.h"
 #include "parser.h"
 #include "list.h"
 
@@ -16,6 +18,22 @@ struct file_info {
         long offset_end;
 };
 
+static void show_section_and_subsections(struct section *s)
+{
+        int i;
+        struct section **sub;
+
+        printf("%*sThis section: %s\n", get_section_level(s)-1, "", get_section_name(s));
+        sub = get_section_subsections(s);
+        for (i = 0; i < get_section_total_subsections(s); i++) {
+                if (get_section_total_subsections(sub[i]) > 0)
+                        show_section_and_subsections(sub[i]);
+
+                printf("%*sSubsection %d: %s\n", get_section_level(sub[i])-1, "", i, get_section_name(sub[i]));
+        }
+        puts("");
+}
+
 void parse_file(struct file *f)
 {
         FILE *fp = get_file_pointer(f);
@@ -26,13 +44,44 @@ void parse_file(struct file *f)
 
         printf("Bytes offset for the beginning: %ld\n", info.offset_start);
         printf("Bytes offset for the end: %ld\n", info.offset_end);
+
+        fseek(fp, 0, SEEK_SET);
+        struct list *sections = parse_section(fp);
+        struct node *n;
+        for (n = list_get_head(sections); n; n = node_get_next(n)) {
+                show_section_and_subsections(node_get_data(n));
+                destroy_section(node_get_data(n), free);
+        }
+
+        destroy_list(sections, NULL);
+
+
 }
 
 
 int main(int argc, char **argv)
 {
+        struct section *s = new_section("Some pretty cool title, innit", 1);
+        struct section *ss = add_subsection(s, new_section("Fancy a cuppa?", 2));
+        struct section *kk = add_subsection(ss, new_section("So english m8", 3));
+        add_subsection(kk, new_section("Du", 4));
+        add_subsection(kk, new_section("Du Hast", 4));
+        add_subsection(kk, new_section("Du Hast Mich", 4));
+        add_subsection(kk, new_section("Du Hast Mich Gefragt", 4));
+        add_subsection(ss, new_section("Bri'ish", 3));
+        struct section *ss2 = add_subsection(s, new_section("Hello, World", 2));
+        struct section *ss3 = add_subsection(s, new_section("Hi there", 2));
+
+        show_section_and_subsections(s);
+        show_section_and_subsections(ss);
+
+        destroy_section(s, NULL);
+
         struct file *f = open_file("./test.md");
+
         parse_file(f);
+
+
         exit(0);
         char *message = "This is a very cool message!\n";
         /*char *loren = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ullamcorper quam mauris, at posuere augue posuere non. Sed iaculis elit et placerat dictum. Nam faucibus venenatis ex. Nullam tempor eros vel lectus gravida tincidunt. Phasellus tincidunt, nisl eget porttitor rhoncus, neque tellus aliquam massa, in ultrices est metus ac sapien. Nam dignissim ipsum diam, vel efficitur nisi placerat vitae. Morbi auctor tellus non ipsum efficitur fringilla id nec ex. Ut lectus magna, laoreet cursus erat at, iaculis egestas nisi. In euismod nisl eu tortor porttitor, vel euismod eros faucibus. Nullam enim quam, iaculis sed nunc euismod, euismod interdum metus. Mauris tristique odio dui, sit amet aliquam mauris ultricies vel. Aliquam condimentum ornare metus, ac blandit nibh elementum at. Curabitur maximus velit rutrum, vestibulum felis sed, dignissim enim. Nam laoreet, nunc eget condimentum viverra, ipsum tortor ullamcorper lorem, a iaculis metus sapien congue risus. Suspendisse sapien diam, rutrum a nulla convallis, sagittis porta justo. Quisque id viverra dolor. Aenean eu convallis mauris, quis rhoncus leo. Nunc tincidunt nibh sed faucibus tempor. Nulla vitae dictum augue, vel ultrices purus. Aliquam efficitur magna nec metus rhoncus molestie. Fusce eget dolor est. Aenean accumsan condimentum ipsum, ac molestie nibh euismod ac. Proin iaculis volutpat diam, at varius libero pretium duis.\n"; */
