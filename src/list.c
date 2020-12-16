@@ -20,6 +20,8 @@ struct list *init_list()
         l->head = NULL;
         l->tail = NULL;
         l->size = 0;
+
+        return l;
 }
 
 struct node *list_get_head(struct list *l)
@@ -53,6 +55,8 @@ static struct node *new_node(void *data)
 
         n->data = data;
         n->next = NULL;
+
+        return n;
 }
 
 void list_add(struct list *l, void *data)
