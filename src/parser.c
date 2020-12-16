@@ -22,6 +22,31 @@ void show_section_and_subsections(struct section *s)
         puts("");
 }
 
+long parse_toc(FILE *fp, char *section)
+{
+
+        size_t section_size = strlen(section);
+        char c;
+        int i;
+
+        for (i = 0; (c = fgetc(fp)) != EOF; ) {
+                if (c == section[i]) {
+                        i++;
+                } else if (c == ' ') {
+                        continue;
+                } else if (c == '\n' && i == section_size) {
+                        return ftell(fp);
+                } else {
+                        while (c = fgetc(fp), c != '\n' && c != EOF)
+                                ;
+                        i = 0;
+                        continue;
+                }
+        }
+
+        return -1;
+}
+
 struct list *parse_section(FILE *fp)
 {
         struct list *sections = init_list();
@@ -59,6 +84,7 @@ struct list *parse_section(FILE *fp)
         return sections;
 }
 
+/*
 int main(void)
 {
         struct section *s = new_section("Some pretty cool title, innit", 1);
@@ -91,3 +117,4 @@ int main(void)
 
         return 0;
 }
+*/
