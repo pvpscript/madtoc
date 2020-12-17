@@ -16,7 +16,7 @@ long parse_toc(FILE *fp, char *section)
         for (i = 0; (c = fgetc(fp)) != EOF; ) {
                 if (c == section[i]) {
                         i++;
-                } else if (c == ' ') {
+                } else if (c == ' ' || c == '\t') {
                         continue;
                 } else if (c == '\n' && i == section_size) {
                         return ftell(fp);
