@@ -34,6 +34,49 @@ static void show_section_and_subsections(struct section *s)
         puts("");
 }
 
+static void inc_index(int *indexes, int index)
+{
+        int i;
+
+        indexes[index]++;
+        for (i = index + 1; i < MAX_SECTION_LEN; i++)
+                indexes[i] = 0;
+}
+
+static void print_section(FILE *stream, int *indexes, int level, char *name)
+{
+        int i;
+
+        fprintf(stream, "%d", indexes[0]);
+        for (i = 1; i < level; i++) 
+                fprintf(stream, ".%d", indexes[i]);
+        fprintf(stream, "\t%s\n", name);
+}
+
+static void show_sections(FILE *stream, struct section *s, int *indexes)
+{
+        struct section **subs = get_section_subsections(s);
+        size_t total_subs = get_section_total_subsections(s); 
+        int level = get_section_level(s);
+        char *name = get_section_name(s);
+        size_t i;
+
+        inc_index(indexes, level - 1);
+        print_section(stream, indexes, level, name);
+
+        for (i = 0; i < total_subs; i++)
+                show_sections(stream, subs[i], indexes);
+}
+
+static void show_toc(FILE *stream, struct list *sections)
+{
+        struct node *n;
+        int indexes[MAX_SECTION_LEN] = { 0 };
+
+        for (n = list_get_head(sections); n; n = node_get_next(n))
+                show_sections(stream, node_get_data(n), indexes);
+}
+
 void parse_file(struct file *f)
 {
         FILE *fp = get_file_pointer(f);
@@ -47,11 +90,14 @@ void parse_file(struct file *f)
 
         fseek(fp, 0, SEEK_SET);
         struct list *sections = parse_section(fp);
+        show_toc(stdout, sections);
+        /*
         struct node *n;
         for (n = list_get_head(sections); n; n = node_get_next(n)) {
                 show_section_and_subsections(node_get_data(n));
                 destroy_section(node_get_data(n), free);
         }
+        */
 
         destroy_list(sections, NULL);
 
@@ -71,6 +117,9 @@ int main(int argc, char **argv)
         add_subsection(ss, new_section("Bri'ish", 3));
         struct section *ss2 = add_subsection(s, new_section("Hello, World", 2));
         struct section *ss3 = add_subsection(s, new_section("Hi there", 2));
+        struct list *l = init_list();
+        list_add(l, s);
+        show_toc(stdout, l);
 
         show_section_and_subsections(s);
         show_section_and_subsections(ss);
