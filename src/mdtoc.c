@@ -43,7 +43,8 @@ static void inc_index(int *indexes, int index)
                 indexes[i] = 0;
 }
 
-static void print_section(FILE *stream, int *indexes, int level, char *name)
+static void print_numbered_section(FILE *stream, int *indexes,  int level,
+                                   char *name)
 {
         int i;
 
@@ -53,7 +54,8 @@ static void print_section(FILE *stream, int *indexes, int level, char *name)
         fprintf(stream, "\t%s\n", name);
 }
 
-static void show_sections(FILE *stream, struct section *s, int *indexes)
+static void show_numbered_sections(FILE *stream, struct section *s,
+                                   int *indexes)
 {
         struct section **subs = get_section_subsections(s);
         size_t total_subs = get_section_total_subsections(s); 
@@ -62,10 +64,21 @@ static void show_sections(FILE *stream, struct section *s, int *indexes)
         size_t i;
 
         inc_index(indexes, level - 1);
-        print_section(stream, indexes, level, name);
+        print_numbered_section(stream, indexes, level, name);
 
         for (i = 0; i < total_subs; i++)
-                show_sections(stream, subs[i], indexes);
+                show_numbered_sections(stream, subs[i], indexes);
+}
+
+static void print_bullet_section(FILE *stream, char *indexes, int level,
+                                 char *name)
+{
+
+}
+
+static void show_bullet_sections(FILE *stream, struct section *s, int *indexes)
+{
+
 }
 
 static void show_toc(FILE *stream, struct list *sections)
@@ -74,7 +87,7 @@ static void show_toc(FILE *stream, struct list *sections)
         int indexes[MAX_SECTION_LEN] = { 0 };
 
         for (n = list_get_head(sections); n; n = node_get_next(n))
-                show_sections(stream, node_get_data(n), indexes);
+                show_numbered_sections(stream, node_get_data(n), indexes);
 }
 
 void parse_file(struct file *f)
