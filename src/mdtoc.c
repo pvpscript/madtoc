@@ -27,8 +27,8 @@ struct config {
 };
 
 static struct config confs[] = {
-        [NUMBERED]      = { { 0 },                              &show_numbered_sections },
-        [BULLET]        = { {'-', '*', '+', '-', '*', '+'},     &show_bullet_sections }
+        [NUMBERED]      = { { 0 },      &show_numbered_sections },
+        [BULLET]        = { { '-' },    &show_bullet_sections }
 };
 
 struct file_info {
@@ -95,7 +95,7 @@ static void print_bullet_section(FILE *stream, int *indexes, int level,
 
         for (i = 0; i < level; i++)
                 fprintf(stream, "\t");
-        fprintf(stream, "%c %s\n", indexes[level], name);
+        fprintf(stream, "%c %s\n", indexes[0], name);
 }
 
 static void show_bullet_sections(FILE *stream, struct section *s, int *indexes)
@@ -114,14 +114,11 @@ static void show_bullet_sections(FILE *stream, struct section *s, int *indexes)
 
 static void show_toc(FILE *stream, struct list *sections, enum types t)
 {
+        int *indexes = confs[t].indexes;
         struct node *n;
 
-        int *indexes = confs[t].indexes;
-        void (*show_sections)(FILE *, struct section *, int *) =
-                confs[t].show_sections;
-
         for (n = list_get_head(sections); n; n = node_get_next(n))
-                show_sections(stream, node_get_data(n), indexes);
+                confs[t].show_sections(stream, node_get_data(n), indexes);
 }
 
 void parse_file(struct file *f)
