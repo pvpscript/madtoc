@@ -13,6 +13,24 @@
 
 #define MAX(x, y) ((x) > (y)) ? (x) : (y)
 
+enum types {
+        NUMBERED = 0,
+        BULLET,
+};
+
+static void show_numbered_sections(FILE *f, struct section *s, int *indexes);
+static void show_bullet_sections(FILE *f, struct section *s, int *indexes);
+
+struct config {
+        int indexes[MAX_SECTION_LEN];
+        void (*show_sections)(FILE *, struct section *, int *);
+};
+
+static struct config confs[] = {
+        [NUMBERED]      = { { 0 },                              &show_numbered_sections },
+        [BULLET]        = { {'-', '*', '+', '-', '*', '+'},     &show_bullet_sections }
+};
+
 struct file_info {
         long offset_start;
         long offset_end;
@@ -70,24 +88,40 @@ static void show_numbered_sections(FILE *stream, struct section *s,
                 show_numbered_sections(stream, subs[i], indexes);
 }
 
-static void print_bullet_section(FILE *stream, char *indexes, int level,
+static void print_bullet_section(FILE *stream, int *indexes, int level,
                                  char *name)
 {
+        int i;
 
+        for (i = 0; i < level; i++)
+                fprintf(stream, "\t");
+        fprintf(stream, "%c %s\n", indexes[level], name);
 }
 
 static void show_bullet_sections(FILE *stream, struct section *s, int *indexes)
 {
+        struct section **subs = get_section_subsections(s);
+        size_t total_subs = get_section_total_subsections(s); 
+        int level = get_section_level(s);
+        char *name = get_section_name(s);
+        size_t i;
 
+        print_bullet_section(stream, indexes, level - 1, name);
+
+        for (i = 0; i < total_subs; i++)
+                show_bullet_sections(stream, subs[i], indexes);
 }
 
-static void show_toc(FILE *stream, struct list *sections)
+static void show_toc(FILE *stream, struct list *sections, enum types t)
 {
         struct node *n;
-        int indexes[MAX_SECTION_LEN] = { 0 };
+
+        int *indexes = confs[t].indexes;
+        void (*show_sections)(FILE *, struct section *, int *) =
+                confs[t].show_sections;
 
         for (n = list_get_head(sections); n; n = node_get_next(n))
-                show_numbered_sections(stream, node_get_data(n), indexes);
+                show_sections(stream, node_get_data(n), indexes);
 }
 
 void parse_file(struct file *f)
@@ -103,7 +137,7 @@ void parse_file(struct file *f)
 
         fseek(fp, 0, SEEK_SET);
         struct list *sections = parse_section(fp);
-        show_toc(stdout, sections);
+        show_toc(stdout, sections, NUMBERED);
         /*
         struct node *n;
         for (n = list_get_head(sections); n; n = node_get_next(n)) {
@@ -132,7 +166,7 @@ int main(int argc, char **argv)
         struct section *ss3 = add_subsection(s, new_section("Hi there", 2));
         struct list *l = init_list();
         list_add(l, s);
-        show_toc(stdout, l);
+        show_toc(stdout, l, BULLET);
 
         show_section_and_subsections(s);
         show_section_and_subsections(ss);
