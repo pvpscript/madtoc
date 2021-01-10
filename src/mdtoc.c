@@ -69,7 +69,7 @@ static void print_numbered_section(FILE *stream, int *indexes,  int level,
         fprintf(stream, "%d", indexes[0]);
         for (i = 1; i < level; i++) 
                 fprintf(stream, ".%d", indexes[i]);
-        fprintf(stream, "\t%s\n<br>\n", name);
+        fprintf(stream, "\t%s\n", name);
 }
 
 static void show_numbered_sections(FILE *stream, struct section *s,
@@ -86,6 +86,9 @@ static void show_numbered_sections(FILE *stream, struct section *s,
 
         for (i = 0; i < total_subs; i++)
                 show_numbered_sections(stream, subs[i], indexes);
+
+	/* Print after a list item */
+	puts("<br>");
 }
 
 static void print_bullet_section(FILE *stream, int *indexes, int level,
