@@ -1,0 +1,10 @@
+Make it work for inserting and updating a table of contents
+
+Write the README.md using the table of contents generator
+	- Write about what it does
+	- How to install it
+	- How to use it
+	- Advantages between this build and other ones that already exists
+	- Explain the usage of HTML tags and show the tests in that site
+
+Change macros to static const variables
