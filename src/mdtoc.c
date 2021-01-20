@@ -84,11 +84,13 @@ static void show_numbered_sections(FILE *stream, struct section *s,
         inc_index(indexes, level - 1);
         print_numbered_section(stream, indexes, level, name);
 
+	/* Print after a list item */
+	puts("<br>");
+
+	/* Print sections recursivelly */
         for (i = 0; i < total_subs; i++)
                 show_numbered_sections(stream, subs[i], indexes);
 
-	/* Print after a list item */
-	puts("<br>");
 }
 
 static void print_bullet_section(FILE *stream, int *indexes, int level,
