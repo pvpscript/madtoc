@@ -11,8 +11,6 @@
 #define START_LINE      "<!-- mdtoc-start -->"
 #define END_LINE        "<!-- mdtoc-end -->" 
 
-#define MAX(x, y) ((x) > (y)) ? (x) : (y)
-
 enum types {
         NUMBERED = 0,
         BULLET,
