@@ -5,30 +5,43 @@
 #include "section.h"
 #include "buffer.h"
 #include "list.h"
+#include "parser.h"
 
-long parse_toc(FILE *fp, char *section)
+struct offset parse_toc(FILE *fp, char *section)
 {
 
         size_t section_size = strlen(section);
+	int real_section_size = 0;
         char c;
         int i;
 
         for (i = 0; (c = fgetc(fp)) != EOF; ) {
                 if (c == section[i]) {
                         i++;
+			real_section_size++;
                 } else if (c == ' ' || c == '\t') {
+			real_section_size++;
                         continue;
                 } else if (c == '\n' && i == section_size) {
-                        return ftell(fp);
+			long offset_end = ftell(fp);
+
+                        return (struct offset) {
+				.start = offset_end - real_section_size - 1,
+				.end = offset_end
+			};
                 } else {
                         while (c = fgetc(fp), c != '\n' && c != EOF)
                                 ;
                         i = 0;
+			real_section_size = 0;
                         continue;
                 }
         }
 
-        return -1;
+        return (struct offset) {
+		.start = -1,
+		.end = -1
+	};
 }
 
 struct list *parse_section(FILE *fp)

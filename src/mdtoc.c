@@ -127,13 +127,11 @@ static void show_toc(FILE *stream, struct list *sections, enum types t)
 void parse_file(struct file *f)
 {
         FILE *fp = get_file_pointer(f);
-        struct file_info info;
-        
-        info.offset_start = parse_toc(fp, START_LINE);
-        info.offset_end = parse_toc(fp, END_LINE);
+	struct offset start_offsets = parse_toc(fp, START_LINE);
+	struct offset end_offsets = parse_toc(fp, END_LINE);
 
-        printf("Bytes offset for the beginning: %ld\n", info.offset_start);
-        printf("Bytes offset for the end: %ld\n", info.offset_end);
+        printf("Bytes offset for the beginning: %ld -> %ld\n", start_offsets.start, start_offsets.end);
+        printf("Bytes offset for the end: %ld -> %ld\n", end_offsets.start, end_offsets.end);
 
         fseek(fp, 0, SEEK_SET);
         struct list *sections = parse_section(fp);

@@ -3,7 +3,12 @@
 
 #include "list.h"
 
-long parse_toc(FILE *fp, char *section);
+struct offset {
+	long start;
+	long end;
+};
+
+struct offset parse_toc(FILE *fp, char *section);
 struct list *parse_section(FILE *fp);
 
 #endif /* PARSER_H */
