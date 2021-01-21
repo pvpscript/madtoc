@@ -29,11 +29,6 @@ static struct config confs[] = {
         [BULLET]        = { { '-' },    &show_bullet_sections }
 };
 
-struct file_info {
-        long offset_start;
-        long offset_end;
-};
-
 static void show_section_and_subsections(struct section *s)
 {
         int i;
