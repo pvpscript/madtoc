@@ -11,6 +11,8 @@
 #define START_LINE      "<!-- mdtoc-start -->"
 #define END_LINE        "<!-- mdtoc-end -->" 
 
+static unsigned indent_size = 4;
+
 enum types {
         NUMBERED = 0,
         BULLET,
@@ -54,15 +56,18 @@ static void inc_index(int *indexes, int index)
                 indexes[i] = 0;
 }
 
-static void print_numbered_section(FILE *stream, int *indexes,  int level,
+static void print_numbered_section(FILE *stream, int *indexes, int level,
                                    char *name)
 {
+	int indent = (level - 1) * indent_size;
         int i;
 
+	for (i = 0; i < indent; i++)
+		fprintf(stream, "&nbsp;");
         fprintf(stream, "%d", indexes[0]);
         for (i = 1; i < level; i++) 
                 fprintf(stream, ".%d", indexes[i]);
-        fprintf(stream, "\t%s\n", name);
+        fprintf(stream, " - %s\n", name);
 }
 
 static void show_numbered_sections(FILE *stream, struct section *s,
