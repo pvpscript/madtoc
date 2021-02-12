@@ -7,6 +7,7 @@
 #include "section.h"
 #include "parser.h"
 #include "list.h"
+#include "utils.h"
 
 #define START_LINE      "<!-- mdtoc-start -->"
 #define END_LINE        "<!-- mdtoc-end -->" 
@@ -67,7 +68,7 @@ static void print_numbered_section(FILE *stream, int *indexes, int level,
         fprintf(stream, "%d", indexes[0]);
         for (i = 1; i < level; i++) 
                 fprintf(stream, ".%d", indexes[i]);
-        fprintf(stream, " - %s\n", name);
+        fprintf(stream, " - [%s](#%s)\n", name, str_to_markdown_anchor(name));
 }
 
 static void show_numbered_sections(FILE *stream, struct section *s,
