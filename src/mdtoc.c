@@ -12,7 +12,8 @@
 #define START_LINE      "<!-- mdtoc-start -->"
 #define END_LINE        "<!-- mdtoc-end -->" 
 
-static unsigned indent_size = 4;
+static const unsigned indent_size = 4;
+static const char *indent_token = "&nbsp;";
 
 enum types {
         NUMBERED = 0,
@@ -64,7 +65,7 @@ static void print_numbered_section(FILE *stream, int *indexes, int level,
         int i;
 
 	for (i = 0; i < indent; i++)
-		fprintf(stream, "&nbsp;");
+		fprintf(stream, indent_token);
         fprintf(stream, "%d", indexes[0]);
         for (i = 1; i < level; i++) 
                 fprintf(stream, ".%d", indexes[i]);
